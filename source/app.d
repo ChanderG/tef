@@ -14,6 +14,7 @@ struct App{
 
 		clear;
 		dir.chdir;
+		foreach (i, t; getcwd) setCell(cast(int)i, 1, t, Color.white|Attribute.underline, Color.basic); // print curr dir
 		files = dirEntries("", SpanMode.shallow).array.to!(string[]);
 		drawFiles;
 		currline = 0;
@@ -23,23 +24,22 @@ struct App{
 	void changeCurrLine(int diff){
 		if ((currline+diff < 0) || (currline+diff >= files.length)) return;
 		// reset current line
-		foreach(i, t; files[currline]) setCell(1+cast(int)i, 1+currline, t, files[currline].getColor, Color.basic);
+		foreach(i, t; files[currline]) setCell(1+cast(int)i, 3+currline, t, files[currline].getColor, Color.basic);
 		currline += diff;
 		// highlight new line
-		foreach(i, t; files[currline]) setCell(1+cast(int)i, 1+currline, t, Color.black, files[currline].getColor);
+		foreach(i, t; files[currline]) setCell(1+cast(int)i, 3+currline, t, files[currline].getColor|Attribute.reverse, Color.basic|Attribute.reverse);
 		flush;
 	}
 
 	// add text at the top leaving a border of 1 
-	void drawFiles() {
+	void drawFiles(){
 		auto trunc = files.take(height-2).map!(a => a.take(width-2)).array.to!(string[]);
 		foreach (j, line; trunc) {
 			auto color = line.getColor;
-			foreach (i, t; line) setCell(1+cast(int)i, 1+cast(int)j, t, color, Color.basic);
+			foreach (i, t; line) setCell(1+cast(int)i, 3+cast(int)j, t, color, Color.basic);
 		}
 		flush;
 	}
-
 }
 
 ushort getColor(string filename){
