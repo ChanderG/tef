@@ -12,16 +12,32 @@ void drawText(const string[] text) {
 	flush;
 }
 
+void changeCurrLine(string[] text, ref int currline, int diff){
+	if ((currline+diff < 0) || (currline+diff >= text.length)) return;
+	foreach(i, t; text[currline]) setCell(1+cast(int)i, 1+currline, t, Color.white, Color.basic);
+	currline += diff;
+	foreach(i, t; text[currline]) setCell(1+cast(int)i, 1+currline, t, Color.blue, Color.white);
+	flush;
+}
+
 void main()
 {
 	init;
 
 	auto files = dirEntries("", SpanMode.shallow).array.to!(string[]);
+
 	drawText(files);
+	int currline = 0;
+	changeCurrLine(files, currline, 0);
 
 	Event e;
 	do {
 		pollEvent(&e);
+		switch(e.key){
+			case Key.arrowUp: changeCurrLine(files, currline, -1); break;
+			case Key.arrowDown: changeCurrLine(files, currline, 1); break;
+			default: break;
+		}
 	} while (e.key != Key.esc);
 
 	shutdown;
