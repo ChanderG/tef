@@ -1,0 +1,12 @@
+{
+	"name": "tef",
+	"authors": [
+		"Chander Govindarajan"
+	],
+	"dependencies": {
+		"termbox": "~master"
+	},
+	"description": "A Tree Explorer and Finder",
+	"copyright": "Copyright © 2018, Chander Govindarajan",
+	"license": "MIT"
+}

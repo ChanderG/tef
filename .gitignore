@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+tef
+tef.so
+tef.dylib
+tef.dll
+tef.a
+tef.lib
+tef-test-*
+*.exe
+*.o
+*.obj
+*.lst
+*.swp
