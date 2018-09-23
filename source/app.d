@@ -20,15 +20,25 @@ void changeCurrLine(string[] text, ref int currline, int diff){
 	flush;
 }
 
+void changeDir(ref string[] files, const string dir, ref int currline){
+	if (!dir.isDir) return;
+
+	clear;
+	dir.chdir;
+	files = dirEntries("", SpanMode.shallow).array.to!(string[]);
+	drawText(files);
+	currline = 0;
+	changeCurrLine(files, currline, 0);
+}
+
 void main()
 {
 	init;
 
-	auto files = dirEntries("", SpanMode.shallow).array.to!(string[]);
-
-	drawText(files);
+	string[] files;
 	int currline = 0;
-	changeCurrLine(files, currline, 0);
+
+	changeDir(files, ".", currline);
 
 	Event e;
 	do {
@@ -36,6 +46,8 @@ void main()
 		switch(e.key){
 			case Key.arrowUp: changeCurrLine(files, currline, -1); break;
 			case Key.arrowDown: changeCurrLine(files, currline, 1); break;
+			case Key.arrowLeft: changeDir(files, "..", currline); break;
+			case Key.arrowRight: changeDir(files, files[currline], currline); break;
 			default: break;
 		}
 	} while (e.key != Key.esc);
