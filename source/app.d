@@ -1,20 +1,21 @@
 import termbox;
-import std.range;
-import std.algorithm;
+import std.range, std.algorithm;
 import std.conv;
-
-import std.file;
+import std.file, std.path;
+import std.stdio;
 
 struct App{
 	string[] files;
 	int currline = 0;
+
+	@property currSel() { return files[currline]; }
 
 	void changeDir(const string dir){
 		if (!dir.isDir) return;
 
 		clear;
 		dir.chdir;
-		foreach (i, t; getcwd) setCell(cast(int)i, 1, t, Color.white|Attribute.underline, Color.basic); // print curr dir
+		foreach (i, t; "pwd: "~getcwd) setCell(cast(int)i, 1, t, Color.white|Attribute.underline, Color.basic); // print curr dir
 		files = dirEntries("", SpanMode.shallow).array.to!(string[]);
 		drawFiles;
 		currline = 0;
@@ -62,7 +63,8 @@ void main()
 			case Key.arrowUp: main.changeCurrLine(-1); break;
 			case Key.arrowDown: main.changeCurrLine(1); break;
 			case Key.arrowLeft: main.changeDir(".."); break;
-			case Key.arrowRight: main.changeDir(main.files[main.currline]); break;
+			case Key.arrowRight: main.changeDir(main.currSel); break;
+			case Key.enter: shutdown; writeln(buildPath(getcwd, main.currSel)); return;
 			default: break;
 		}
 	} while (e.key != Key.esc);
