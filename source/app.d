@@ -12,13 +12,15 @@ struct App{
 
 	void changeDir(const string dir){
 		if (!dir.isDir) return;
+		string prevdir = getcwd.baseName;
 
 		clear;
 		dir.chdir;
 		foreach (i, t; "pwd: "~getcwd) setCell(cast(int)i, 1, t, Color.white|Attribute.underline, Color.basic); // print curr dir
 		files = dirEntries("", SpanMode.shallow).array.to!(string[]);
 		drawFiles;
-		currline = 0;
+		if (dir == "..") currline = to!int(countUntil(files, prevdir));
+		else currline = 0;
 		changeCurrLine(0);
 	}
 	
