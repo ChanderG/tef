@@ -1,7 +1,7 @@
 import termbox;
 import std.range, std.algorithm;
 import std.conv;
-import std.file, std.path;
+import std.file, std.path, std.process;
 import std.stdio;
 
 struct App{
@@ -43,6 +43,12 @@ struct App{
 		}
 		flush;
 	}
+
+	void searchCurrentFiles(){
+		// call external fuzzy finder
+		auto ff = executeShell("ls | dmenu -i -b -l 10 -p /");
+		changeCurrLine(cast(int)countUntil(files, ff.output.strip('\n')) - currline);
+	}
 }
 
 ushort getColor(string filename){
@@ -59,17 +65,22 @@ void main()
 	main.changeDir(".");
 
 	Event e;
-	do {
+	io: do {
 		pollEvent(&e);
 		switch(e.key){
-			case Key.arrowUp: main.changeCurrLine(-1); break;
-			case Key.arrowDown: main.changeCurrLine(1); break;
-			case Key.arrowLeft: main.changeDir(".."); break;
-			case Key.arrowRight: main.changeDir(main.currSel); break;
+			case Key.esc: break io;
+			case Key.arrowUp: main.changeCurrLine(-1); continue;
+			case Key.arrowDown: main.changeCurrLine(1); continue;
+			case Key.arrowLeft: main.changeDir(".."); continue;
+			case Key.arrowRight: main.changeDir(main.currSel); continue;
 			case Key.enter: shutdown; writeln(buildPath(getcwd, main.currSel)); return;
 			default: break;
 		}
-	} while (e.key != Key.esc);
+		switch(e.ch){
+			case '/': main.searchCurrentFiles; break;
+			default: break;
+		}
+	} while (true);
 
 	shutdown;
 }
