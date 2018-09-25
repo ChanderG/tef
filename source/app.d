@@ -46,8 +46,12 @@ struct App{
 
 	void searchCurrentFiles(){
 		// call external fuzzy finder
-		auto ff = executeShell("ls | dmenu -i -b -l 10 -p /");
-		changeCurrLine(cast(int)countUntil(files, ff.output.strip('\n')) - currline);
+		auto ff = pipeShell("dmenu -i -b -l 10 -p /", Redirect.stdin | Redirect.stdout);
+		files.each!(l => ff.stdin.writeln(l));
+		ff.stdin.flush;
+		ff.stdin.close;
+		ff.pid.wait;
+		changeCurrLine(cast(int)countUntil(files, ff.stdout.readln.strip('\n')) - currline);
 	}
 }
 
